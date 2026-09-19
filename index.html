@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Slap Chips - Zero-Gravity Tabletop Web Game</title>
+  <meta name="description" content="A vibrant tabletop game with 3D Anime avatars, Robot AI in the park, zero-gravity physics, and friends room codes.">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/effects.css">
+
+  <!-- Matter.js 2D Physics CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+</head>
+<body>
+
+  <!-- Zero-Gravity Matter.js Interactive Background Canvas -->
+  <canvas id="physics-canvas"></canvas>
+
+  <!-- Fullscreen Visual Effects Overlay Layer -->
+  <div id="vfx-overlay"></div>
+
+  <!-- Main Game Container -->
+  <div id="game-app">
+
+    <!-- ==========================================================
+         INTERFACE 1: LAUNCH PAGE / SPLASH SCREEN (BEIGE THEME)
+         ========================================================== -->
+    <section id="launch-screen" class="screen active launch-beige-theme">
+      
+      <!-- Ambient Floating Food Items (Matching Reference Image 1) -->
+      <div class="launch-food-floating-layer">
+        <div class="floating-food-item food-burger">🍔</div>
+        <div class="floating-food-item food-pizza">🍕</div>
+        <div class="floating-food-item food-chicken">🍗</div>
+        <div class="floating-food-item food-chips">🥔</div>
+        <div class="floating-food-item food-fries">🍟</div>
+        <div class="floating-food-item food-soda">🥤</div>
+      </div>
+
+      <!-- Centered Game Title & Start Button -->
+      <div class="launch-center-content">
+        <div class="launch-crown-badge">👑</div>
+        <h1 class="launch-pixel-title">SLAP CHIPS</h1>
+        <div class="launch-pixel-sub">TABLETOP SHOWDOWN</div>
+
+        <!-- Stylized Arcade Start Button Directly at Center Bottom -->
+        <button id="btn-launch-start" class="btn-arcade-start">
+          <span class="corner-bracket top-l"></span>
+          <span class="corner-bracket top-r"></span>
+          <span class="start-btn-label">START</span>
+          <span class="corner-bracket bot-l"></span>
+          <span class="corner-bracket bot-r"></span>
+        </button>
+
+        <div class="launch-badges-strip">
+          <span>🥔 Crisp Chips</span>
+          <span>•</span>
+          <span>🤖 Robot AI</span>
+          <span>•</span>
+          <span>👥 Online Rooms</span>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==========================================================
+         INTERFACE 2: MAIN LOBBY SCREEN (LUDO KING INSPIRATION)
+         ========================================================== -->
+    <section id="lobby-screen" class="screen">
+
+      <!-- TOP BAR HUD -->
+      <header class="lobby-top-bar interactive">
+        
+        <!-- Left: Profile Badge Button -->
+        <div class="profile-badge-btn" id="btn-profile-badge" title="Click to edit profile & choose anime character">
+          <div class="profile-avatar-frame">
+            <div id="top-avatar-preview" class="top-avatar-mini"></div>
+            <div class="online-indicator-dot"></div>
+          </div>
+          <div class="profile-level-star">⭐1</div>
+          <button id="btn-settings-gear" class="gear-icon-btn" title="Edit Profile & Settings">⚙️</button>
+        </div>
+
+        <!-- Center: Points & Gems Counter Pills (Matching Reference Image) -->
+        <div class="currency-pills-row">
+          
+          <!-- Gems Pill (150 +) -->
+          <div class="currency-pill gems-pill">
+            <span class="currency-icon">💎</span>
+            <span id="lobby-gems-val" class="currency-value">150</span>
+            <button class="pill-add-btn" id="btn-buy-gems">+</button>
+          </div>
+
+          <!-- Points Pill (4,640 +) -->
+          <div class="currency-pill points-pill">
+            <span class="currency-icon">🪙</span>
+            <span id="lobby-points-val" class="currency-value">4,640</span>
+            <button class="pill-add-btn" id="btn-buy-points">+</button>
+          </div>
+
+        </div>
+
+        <!-- Right: Shop & Audio Controls -->
+        <div class="top-right-actions">
+          <button id="btn-shop-top" class="icon-hud-btn" title="Shop">🛒</button>
+          <button id="btn-audio-toggle" class="icon-hud-btn" title="Toggle Sound / BGM">🔊</button>
+        </div>
+
+      </header>
+
+      <!-- UPPER CENTER: 3D CROWNED GAME LOGO -->
+      <div class="lobby-logo-container">
+        <div class="logo-crown">👑</div>
+        <div class="logo-text-3d">SLAP CHIPS</div>
+        <div class="logo-decorations">
+          <span class="decor-chip">✨</span>
+          <span class="decor-card">🍟</span>
+          <span class="decor-chip">✨</span>
+        </div>
+      </div>
+
+      <!-- MAIN GAME MODE SELECTION SECTION -->
+      <div class="game-modes-container interactive">
+        
+        <!-- Row 1: Primary Modes (Computer & Friends) -->
+        <div class="modes-primary-grid">
+
+          <!-- 1. VS COMPUTER MODE BUTTON -->
+          <button id="btn-mode-computer" class="game-mode-card btn-golden-3d card-computer">
+            <div class="mode-card-top-icon">
+              <span class="mode-emoji">🤖</span>
+              <span class="mode-vs-badge">VS</span>
+            </div>
+            <div class="mode-card-title">COMPUTER</div>
+            <div class="mode-card-sub">Battle Robo-Chip 3000</div>
+            <div class="mode-players-online">● Ready to Play</div>
+          </button>
+
+          <!-- 2. PLAY WITH FRIENDS MODE BUTTON -->
+          <button id="btn-mode-friends" class="game-mode-card btn-golden-3d card-friends">
+            <div class="mode-card-top-icon">
+              <span class="mode-emoji">👥</span>
+              <span class="mode-heart-badge">❤️</span>
+            </div>
+            <div class="mode-card-title">FRIENDS</div>
+            <div class="mode-card-sub">Room Passcode Online</div>
+            <div class="mode-players-online">● 2-Player Match</div>
+          </button>
+
+        </div>
+
+        <!-- Row 2: Secondary Modes & Features -->
+        <div class="modes-secondary-row">
+          <button id="btn-daily-spin" class="secondary-mode-pill spin-wheel-cta">
+            <span class="spin-cta-icon">🎡</span>
+            <span class="spin-cta-text">LUCKY SPIN</span>
+            <span class="spin-badge-free" id="spin-free-badge">FREE</span>
+          </button>
+          <button id="btn-mode-tournament" class="secondary-mode-pill">
+            <span>🏆</span> Tournament
+          </button>
+          <button id="btn-claim-bonus" class="secondary-mode-pill highlight-gold">
+            <span>🎁</span> Claim Daily Bonus
+          </button>
+        </div>
+
+      </div>
+
+      <!-- BOTTOM NAVIGATION BAR (MATCHING REFERENCE IMAGE) -->
+      <nav class="lobby-bottom-nav interactive">
+        <button id="nav-home" class="nav-item active">
+          <span class="nav-icon">🏠</span>
+          <span class="nav-label">HOME</span>
+        </button>
+        <button id="nav-profile" class="nav-item">
+          <span class="nav-icon">👤</span>
+          <span class="nav-label">PROFILE</span>
+        </button>
+        <button id="nav-shop" class="nav-item">
+          <span class="nav-icon">🛒</span>
+          <span class="nav-label">SHOP</span>
+        </button>
+        <button id="nav-stats" class="nav-item">
+          <span class="nav-icon">📊</span>
+          <span class="nav-label">STATS</span>
+        </button>
+        <button id="nav-rules" class="nav-item">
+          <span class="nav-icon">❓</span>
+          <span class="nav-label">RULES</span>
+        </button>
+      </nav>
+
+    </section>
+
+    <!-- ==========================================================
+         INTERFACE 3: MAIN MATCH TABLETOP SCREEN (PARK ARENA)
+         ========================================================== -->
+    <section id="match-screen" class="screen">
+
+      <!-- High-End 3D Sunny Daytime Park Environment with Distant Aura Players -->
+      <div class="roblox-park-env">
+        <div class="park-skybox">
+          <div class="park-sun-burst"></div>
+          <div class="park-cloud cloud-1"></div>
+          <div class="park-cloud cloud-2"></div>
+          <div class="park-cloud cloud-3"></div>
+          <div class="park-treeline-distant"></div>
+        </div>
+        <div class="roblox-studs-ground"></div>
+        
+        <!-- Distant Park Players with Animated Auras (Matching Images 2, 4, 5) -->
+        <div class="park-distant-players">
+          <div class="bg-player player-galactic">
+            <div class="aura-glow aura-galactic"></div>
+            <div class="bg-avatar-sprite">🥋</div>
+            <div class="aura-tag">Galactic Aura</div>
+          </div>
+          <div class="bg-player player-cursed">
+            <div class="aura-glow aura-cursed"></div>
+            <div class="bg-avatar-sprite">🔥</div>
+            <div class="aura-tag">Cursed Aura</div>
+          </div>
+          <div class="bg-player player-heavenly">
+            <div class="aura-glow aura-heavenly"></div>
+            <div class="bg-avatar-sprite">⚡</div>
+            <div class="aura-tag">Heavenly Aura</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Center Turn Banner & Timer -->
+      <div class="roblox-turn-hud">
+        <div id="roblox-turn-text" class="roblox-turn-title">Robo-Chip 3000's turn to eat</div>
+        <div id="roblox-turn-timer" class="roblox-timer-num">20</div>
+      </div>
+
+      <!-- Fatal Slap Announcement Banner (Image 5 Reference) -->
+      <div id="fatal-slap-banner" class="fatal-slap-banner">
+        <span class="fatal-fire-icon">🔥</span>
+        <span id="fatal-banner-text">FATAL SLAP! Robo-Chip 3000 IS OUT!</span>
+        <span class="fatal-fire-icon">🔥</span>
+      </div>
+
+      <!-- Left Middle Slap Glove Badge Button -->
+      <div class="roblox-slap-badge interactive" id="btn-slap-badge" title="Slap Counter & Glove Power">
+        <div class="slap-badge-icon">✋</div>
+        <div class="slap-badge-label">Slaps</div>
+      </div>
+
+      <!-- Bottom Left Roblox Points & Boost -->
+      <div class="roblox-bottom-hud">
+        <div id="roblox-cash-val" class="roblox-cash-display">🪙 4,640</div>
+        <div id="roblox-boost-val" class="roblox-boost-display">Friend Boost: +0%</div>
+      </div>
+
+      <!-- Slap Strike Dynamic Slash VFX Layer -->
+      <div id="slap-strike-vfx" class="slap-strike-vfx"></div>
+
+      <!-- Main Front-View 3D Tabletop Arena -->
+      <div class="tabletop-3d-scene frontview-scene">
+
+        <!-- Seated Characters Area (Facing Camera Behind Table) -->
+        <div class="seated-avatars-row">
+          
+          <!-- Left Character Seat (Robot or Friend) -->
+          <div class="avatar-seat-unit left-seat" id="seat-left">
+            <!-- 3 Hearts at the top of head (Image Reference) -->
+            <div class="overhead-hearts-bar" id="hearts-left">
+              <span class="head-heart heart-1">❤️</span>
+              <span class="head-heart heart-2">❤️</span>
+              <span class="head-heart heart-3">❤️</span>
+            </div>
+            <div class="overhead-name-tag" id="overhead-name-left">Robo-Chip 3000</div>
+            <div class="seated-avatar-model" id="avatar-model-left"></div>
+            <div class="avatar-eating-hand hand-left" id="hand-anim-left"></div>
+          </div>
+
+          <!-- Right Character Seat (Player's Avatar) -->
+          <div class="avatar-seat-unit right-seat" id="seat-right">
+            <!-- 3 Hearts at the top of head (Image Reference) -->
+            <div class="overhead-hearts-bar" id="hearts-right">
+              <span class="head-heart heart-1">❤️</span>
+              <span class="head-heart heart-2">❤️</span>
+              <span class="head-heart heart-3">❤️</span>
+            </div>
+            <div class="overhead-name-tag" id="overhead-name-right">sap1kaa</div>
+            <div class="seated-avatar-model" id="avatar-model-right"></div>
+            <div class="avatar-eating-hand hand-right" id="hand-anim-right"></div>
+          </div>
+
+        </div>
+
+        <!-- 3D Pink Marble Table Assembly with 4 Visible Wooden Legs (Image 2 & 3 Reference) -->
+        <div class="frontview-table-assembly">
+          <div class="pink-marble-tabletop">
+            <div class="marble-veins-overlay"></div>
+
+            <!-- Left Tray: Sky Blue (3 cols x 4 rows = 12 tiles) -->
+            <div class="roblox-tray left-tray-blue" id="tray-container-left">
+              <div class="roblox-grid-3x4" id="chip-grid-left">
+                <!-- 12 blue tiles populated dynamically -->
+              </div>
+            </div>
+
+            <!-- Right Tray: Peach / Salmon-Orange (3 cols x 4 rows = 12 tiles) -->
+            <div class="roblox-tray right-tray-peach" id="tray-container-right">
+              <div class="roblox-grid-3x4" id="chip-grid-right">
+                <!-- 12 peach tiles populated dynamically -->
+              </div>
+            </div>
+
+          </div>
+          
+          <!-- Table Front Apron Edge -->
+          <div class="table-pink-apron"></div>
+
+          <!-- 4 Visible Wooden Table Legs on Grass -->
+          <div class="table-legs-row">
+            <div class="wooden-leg leg-front-left"></div>
+            <div class="wooden-leg leg-back-left"></div>
+            <div class="wooden-leg leg-back-right"></div>
+            <div class="wooden-leg leg-front-right"></div>
+          </div>
+          <div class="table-grass-shadow"></div>
+        </div>
+
+      </div>
+
+      <!-- Match Bottom Right Controls -->
+      <div class="match-bottom-controls interactive">
+        <button id="btn-forfeit" class="arcade-btn btn-danger" style="padding: 6px 14px; font-size: 0.85rem;">
+          FORFEIT
+        </button>
+      </div>
+
+    </section>
+
+    <!-- ==========================================================
+         MODAL 1: PROFILE & 6 ANIME CHARACTERS MODAL
+         ========================================================== -->
+    <div id="profile-modal" class="modal-backdrop">
+      <div class="modal-window modal-wide">
+        
+        <div class="modal-header-row">
+          <h2 class="modal-title">PLAYER PROFILE & ANIME FIGHTERS</h2>
+          <button id="btn-close-profile" class="modal-close-btn">✕</button>
+        </div>
+
+        <!-- Username Editor Section -->
+        <div class="profile-user-section">
+          <div class="profile-current-avatar" id="profile-modal-avatar-preview"></div>
+          <div class="profile-edit-box">
+            <label class="input-label">USERNAME</label>
+            <div class="username-input-row">
+              <input type="text" id="input-username" class="username-field" maxlength="15" value="Player 1">
+              <button id="btn-save-username" class="arcade-btn btn-primary" style="padding: 8px 16px;">SAVE</button>
+            </div>
+            <div class="profile-stats-mini">
+              <span>Points: <strong id="profile-points-display" style="color: #facc15;">4,640</strong></span> • 
+              <span>Wins: <strong id="profile-wins-display">0</strong></span> • 
+              <span>Streak: <strong id="profile-streak-display">0</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <hr class="modal-divider">
+
+        <!-- 6 Anime Characters Selection Grid -->
+        <div class="anime-roster-header">CHOOSE YOUR ANIME FIGHTER (6 CHOICES)</div>
+        <div class="anime-characters-grid" id="anime-roster-container">
+          <!-- Dynamically populated by app.js -->
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==========================================================
+         MODAL 2: FRIENDS ROOM MODAL (UNIVERSAL LIVE WAITING ROOM)
+         ========================================================== -->
+    <div id="friends-modal" class="modal-backdrop">
+      <div class="modal-window" style="max-width: 550px;">
+        
+        <div class="modal-header-row">
+          <h2 class="modal-title">PLAY WITH FRIENDS ONLINE</h2>
+          <button id="btn-close-friends" class="modal-close-btn">✕</button>
+        </div>
+
+        <!-- Room Action Tabs -->
+        <div class="room-tabs-nav">
+          <button id="tab-btn-create" class="room-tab-btn active">CREATE ROOM</button>
+          <button id="tab-btn-join" class="room-tab-btn">JOIN ROOM</button>
+        </div>
+
+        <!-- Tab 1: Create Room Content (Live Waiting Lobby) -->
+        <div id="tab-content-create" class="room-tab-pane active">
+          <p style="color: #cbd5e1; font-size: 0.92rem; margin-bottom: 8px;">
+            Share this 4-digit code with your friend. When they enter it, the match starts!
+          </p>
+
+          <div class="passcode-display-box">
+            <span id="created-passcode-val" class="passcode-number">7842</span>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;">
+              <button id="btn-copy-passcode" class="btn-copy-code" title="Copy 4-digit code">📋 COPY</button>
+              <button id="btn-open-friend-tab" class="btn-copy-code" style="background: linear-gradient(180deg, #10b981 0%, #059669 100%); border: 1.5px solid #6ee7b7;" title="Open second player in new tab to test 2-player match">👥 TEST IN 2ND TAB</button>
+            </div>
+          </div>
+
+          <!-- 2-PLAYER LIVE LOBBY SLOTS -->
+          <div class="live-lobby-slots">
+            
+            <!-- Slot 1: Host -->
+            <div class="lobby-player-slot slot-ready">
+              <div class="slot-avatar-wrap" id="lobby-host-avatar"></div>
+              <div class="slot-name" id="lobby-host-name">Host Player</div>
+              <div class="slot-status badge-ready">🟢 HOST READY</div>
+            </div>
+
+            <!-- VS Badge -->
+            <div class="lobby-vs-badge">VS</div>
+
+            <!-- Slot 2: Friend / Guest (Radar when waiting) -->
+            <div class="lobby-player-slot" id="lobby-guest-slot">
+              <div class="slot-avatar-wrap" id="lobby-guest-avatar">
+                <div class="radar-scan-circle">
+                  <div class="radar-sweep-beam"></div>
+                  <div class="radar-ping-dot"></div>
+                </div>
+                <span class="radar-icon-center">📡</span>
+              </div>
+              <div class="slot-name" id="lobby-guest-name">Searching...</div>
+              <div class="slot-status badge-waiting" id="lobby-guest-status">⏳ WAITING FOR FRIEND</div>
+            </div>
+
+          </div>
+
+          <div id="create-room-status" class="room-status-badge">
+            🟢 Room Open: Share code or click 'Test in 2nd Tab' to connect!
+          </div>
+
+          <div style="margin-top: 14px;">
+            <button id="btn-start-friend-match" class="arcade-btn btn-disabled" disabled style="width: 100%; padding: 14px; font-size: 1.15rem;">
+              🔒 WAITING FOR FRIEND TO JOIN (CANNOT START ALONE)
+            </button>
+            <div style="display: flex; justify-content: center; margin-top: 10px;">
+              <button id="btn-simulate-friend-join" class="arcade-btn" style="background: none; border: 1.5px dashed #d97706; color: #78350f; font-size: 0.8rem; padding: 6px 14px; cursor: pointer; border-radius: 8px;">
+                ⚡ Simulate Friend Joining in Same Tab (Instant Demo)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Join Room Content -->
+        <div id="tab-content-join" class="room-tab-pane">
+          <p style="color: #cbd5e1; font-size: 0.95rem; margin-bottom: 14px;">
+            Enter the 4-digit room passcode from your friend to join their match:
+          </p>
+          <div style="display: flex; justify-content: center; margin-bottom: 14px;">
+            <input type="text" id="input-join-passcode" class="passcode-input-field" maxlength="4" placeholder="1234">
+          </div>
+          <div id="join-room-status" style="font-size: 0.85rem; color: #93c5fd; min-height: 24px; margin-bottom: 10px;"></div>
+          <button id="btn-submit-join-room" class="arcade-btn btn-green" style="width: 100%;">
+            ⚡ JOIN ROOM & CONNECT
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==========================================================
+         MODAL 3: QTE SLAP POWER METER MODAL
+         ========================================================== -->
+    <div id="qte-modal" class="modal-backdrop">
+      <div class="modal-window">
+        <div class="qte-header" id="qte-title">SLAP POWER METER!</div>
+        <div class="qte-subtext" id="qte-instruction">Stop in the center for CRITICAL SLAP x3.0!</div>
+
+        <!-- Power Meter Slider Track -->
+        <div class="meter-track-container">
+          <div class="meter-zones">
+            <div class="zone-1"></div>
+            <div class="zone-2"></div>
+            <div class="zone-crit"></div>
+            <div class="zone-4"></div>
+            <div class="zone-5"></div>
+          </div>
+          <div id="qte-needle" class="meter-needle"></div>
+        </div>
+
+        <div id="qte-power-text" class="power-display-box">x1.0 POWER</div>
+
+        <button id="btn-slap-qte" class="arcade-btn btn-danger btn-qte-stop">
+          💥 SLAP NOW! 💥
+        </button>
+      </div>
+    </div>
+
+    <!-- ==========================================================
+         MODAL 4: MATCH OUTCOME / REWARDS MODAL
+         ========================================================== -->
+    <div id="outcome-modal" class="modal-backdrop">
+      <div class="modal-window">
+        <div id="outcome-title" class="outcome-title victory">VICTORY!</div>
+        <div id="outcome-flavor" class="outcome-flavor">Incredible tabletop master! You wiped their chips clean!</div>
+
+        <!-- Rewards Breakdown -->
+        <div class="rewards-card">
+          <div class="rew-row">
+            <span>Base Match Points</span>
+            <strong id="rew-base">+300</strong>
+          </div>
+          <div class="rew-row">
+            <span>Win Streak Bonus</span>
+            <strong id="rew-streak">+0</strong>
+          </div>
+          <div class="rew-row">
+            <span>Hearts Remaining</span>
+            <strong id="rew-hearts">+50</strong>
+          </div>
+          <hr style="border: 0; border-top: 1px solid #475569; margin: 8px 0;">
+          <div class="rew-row total">
+            <span>TOTAL POINTS GAINED</span>
+            <strong id="rew-total" style="color: #ffd700;">+350</strong>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: 14px; margin-top: 18px; width: 100%;">
+          <button id="btn-outcome-replay" class="arcade-btn btn-green" style="flex: 1;">
+            PLAY AGAIN
+          </button>
+          <button id="btn-outcome-menu" class="arcade-btn btn-primary" style="flex: 1;">
+            MAIN LOBBY
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================================
+         MODAL 5: MATCH HISTORY & STATS MODAL
+         ========================================================== -->
+    <div id="history-modal" class="modal-backdrop">
+      <div class="modal-window modal-wide">
+        <h3 class="screen-heading" style="font-size: 2rem; margin-bottom: 8px;">MATCH HISTORY & STATS</h3>
+
+        <div id="history-last-match-spotlight"></div>
+
+        <div class="table-responsive">
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Result</th>
+                <th>Fighter</th>
+                <th>Opponent</th>
+                <th>Points Won</th>
+                <th>Hearts</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-body"></tbody>
+          </table>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 16px;">
+          <button id="btn-reset-stats" class="arcade-btn btn-danger" style="padding: 8px 14px; font-size: 0.85rem;">
+            RESET STATS
+          </button>
+          <button id="btn-close-history" class="arcade-btn btn-primary" style="padding: 8px 24px;">
+            CLOSE
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================================
+         MODAL 6: HOW TO PLAY MODAL
+         ========================================================== -->
+    <div id="how-to-play-modal" class="modal-backdrop">
+      <div class="modal-window" style="max-width: 540px; text-align: left;">
+        <h3 class="screen-heading" style="font-size: 2.2rem; text-align: center; margin-bottom: 14px;">HOW TO PLAY</h3>
+        
+        <div style="font-size: 0.95rem; line-height: 1.6; color: #cbd5e1; display: flex; flex-direction: column; gap: 12px;">
+          <p>🎯 <strong>Phase 1 (Hide Slaps):</strong> Hide 3 secret slap traps on your opponent's 3×4 tray. The opponent does the same on yours.</p>
+          <p>🍪 <strong>Phase 2 (Eat Chips):</strong> Take turns picking a covered chip from your own tray. If safe, you eat it peacefully!</p>
+          <p>💥 <strong>Phase 3 (Slap QTE):</strong> If someone hits a hidden slap, the attacker gets a moving Power Meter (x1.0 to x3.0). Hit the center sweet spot for a CRITICAL SLAP!</p>
+          <p>❤️ <strong>Knockout:</strong> Each player has 3 hearts. Depleting all 3 triggers a <strong>FATAL SLAP</strong> with exploding zero-gravity debris!</p>
+          <p>🪙 <strong>Points System:</strong> Winning increases your points! When you lose, <strong>nothing goes</strong> (zero penalty).</p>
+          <p>🤖 <strong>Game Modes:</strong> Play VS Computer (Robo-Chip in the park) or create/join a room with a 4-digit passcode to play with friends!</p>
+        </div>
+
+        <button id="btn-close-rules" class="arcade-btn btn-primary" style="margin-top: 20px; width: 100%;">
+          GOT IT! LET'S PLAY
+        </button>
+      </div>
+    </div>
+
+    <!-- ==========================================================
+         MODAL 7: CHIP FLAVOR COSMETICS SHOP
+         ========================================================== -->
+    <div id="shop-modal" class="modal-backdrop">
+      <div class="modal-window" style="max-width: 580px;">
+        <h3 class="screen-heading" style="font-size: 2.2rem; margin-bottom: 6px;">CHIP FLAVOR SHOP</h3>
+        <p style="color: #cbd5e1; font-size: 0.95rem; margin-bottom: 12px;">
+          Spend your match points to unlock custom tray chips & snacks!
+        </p>
+
+        <div style="font-family: var(--font-display); font-size: 1.2rem; color: #ffd700; margin-bottom: 8px;">
+          YOUR POINTS: <span id="shop-wallet-cash">4,640</span>
+        </div>
+
+        <div class="flavor-grid" id="flavor-grid">
+          <!-- Dynamically populated -->
+        </div>
+
+        <button id="btn-close-shop" class="arcade-btn btn-blue" style="margin-top: 14px; width: 100%;">
+          CLOSE SHOP
+        </button>
+      </div>
+    </div>
+
+    <!-- ==========================================================
+         MODAL 8: BANK & COIN / GEM REWARD SHOP
+         ========================================================== -->
+    <div id="bank-modal" class="modal-backdrop">
+      <div class="modal-window modal-wide" style="max-width: 580px;">
+        <div class="modal-header-row">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 1.6rem;">🏦</span>
+            <h2 class="modal-title">BANK & REWARDS</h2>
+          </div>
+          <button id="btn-close-bank" class="modal-close-btn">✕</button>
+        </div>
+
+        <!-- Current Balance Strip -->
+        <div class="bank-wallet-strip">
+          <div class="bank-wallet-pill">
+            <span class="currency-icon">🪙</span>
+            <span>Coins:</span>
+            <strong id="bank-coins-display" style="color: #fde047;">4,640</strong>
+          </div>
+          <div class="bank-wallet-pill">
+            <span class="currency-icon">💎</span>
+            <span>Gems:</span>
+            <strong id="bank-gems-display" style="color: #67e8f9;">150</strong>
+          </div>
+        </div>
+
+        <!-- Featured Rewarded Video Ad Offer -->
+        <div class="bank-featured-ad-card">
+          <div class="ad-card-badge">⭐ FREE BONUS</div>
+          <div class="ad-card-content">
+            <div class="ad-card-icon">🎬</div>
+            <div class="ad-card-details">
+              <div class="ad-card-title">WATCH SPONSORED VIDEO AD</div>
+              <div class="ad-card-desc">Watch a 5-second mobile game clip to earn free coins!</div>
+              <div class="ad-card-reward">+250 FREE COINS 🪙</div>
+            </div>
+            <button id="btn-watch-ad" class="arcade-btn btn-green btn-watch-pulse">
+              ▶ WATCH (5s)
+            </button>
+          </div>
+        </div>
+
+        <!-- In-App Purchase Bundles (Google Play Simulator) -->
+        <div class="bank-bundles-title">GOOGLE PLAY STORE BUNDLES</div>
+        <div class="bank-bundles-grid">
+          
+          <div class="bundle-card">
+            <div class="bundle-icon">🪙</div>
+            <div class="bundle-amount">2,500 COINS</div>
+            <div class="bundle-name">Handful of Chips</div>
+            <button class="arcade-btn btn-golden-3d btn-buy-pack" data-pack="coins_2500" data-name="2,500 Coins" data-cost="$0.99" data-reward="2500" data-type="points">
+              $0.99
+            </button>
+          </div>
+
+          <div class="bundle-card popular">
+            <div class="bundle-tag">BEST VALUE</div>
+            <div class="bundle-icon">💰</div>
+            <div class="bundle-amount">10,000 COINS</div>
+            <div class="bundle-name">Party Platter</div>
+            <button class="arcade-btn btn-golden-3d btn-buy-pack" data-pack="coins_10000" data-name="10,000 Coins" data-cost="$2.99" data-reward="10000" data-type="points">
+              $2.99
+            </button>
+          </div>
+
+          <div class="bundle-card">
+            <div class="bundle-icon">💎</div>
+            <div class="bundle-amount">100 GEMS</div>
+            <div class="bundle-name">Gem Satchel</div>
+            <button class="arcade-btn btn-blue btn-buy-pack" data-pack="gems_100" data-name="100 Gems" data-cost="$0.99" data-reward="100" data-type="gems">
+              $0.99
+            </button>
+          </div>
+
+          <div class="bundle-card">
+            <div class="bundle-icon">💎👑</div>
+            <div class="bundle-amount">500 GEMS</div>
+            <div class="bundle-name">Diamond Vault</div>
+            <button class="arcade-btn btn-blue btn-buy-pack" data-pack="gems_500" data-name="500 Gems" data-cost="$3.99" data-reward="500" data-type="gems">
+              $3.99
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==========================================================
+         MODAL 9: SIMULATED REWARDED VIDEO AD PLAYER
+         ========================================================== -->
+    <div id="ad-modal" class="modal-backdrop">
+      <div class="modal-window ad-video-window" style="max-width: 500px; padding: 0; overflow: hidden;">
+        
+        <!-- Ad Header Bar -->
+        <div class="ad-top-header">
+          <div class="ad-sponsor-tag">📢 SPONSORED REWARD AD</div>
+          <div class="ad-countdown-pill" id="ad-timer-pill">Reward in <strong id="ad-countdown-seconds">5</strong>s</div>
+          <button id="btn-close-ad" class="ad-close-btn disabled" title="Available after ad completes">✕</button>
+        </div>
+
+        <!-- Ad Screen Video Simulation -->
+        <div class="ad-video-screen">
+          <div class="ad-game-banner">
+            <div class="ad-game-crown">👑</div>
+            <div class="ad-game-title">SLAP CHIPS MOBILE</div>
+            <div class="ad-game-sub">NOW ON GOOGLE PLAY STORE!</div>
+          </div>
+
+          <div class="ad-game-scene-preview">
+            <div class="ad-fighter float-left">🥋</div>
+            <div class="ad-snack-spin">🥔💥✋</div>
+            <div class="ad-robot float-right">🤖</div>
+          </div>
+
+          <div class="ad-rating-row">
+            <span>⭐⭐⭐⭐⭐ 4.9 Rating</span>
+            <span>• 100K+ Active Players</span>
+          </div>
+
+          <!-- Progress Bar at bottom of video -->
+          <div class="ad-progress-track">
+            <div id="ad-progress-fill" class="ad-progress-bar"></div>
+          </div>
+        </div>
+
+        <!-- Ad Footer Complete Message -->
+        <div class="ad-footer-bar" id="ad-footer">
+          <div id="ad-footer-status">Watching sponsor ad... (+250 Coins)</div>
+          <button id="btn-claim-ad-reward" class="arcade-btn btn-golden-3d" style="display: none; width: 100%; padding: 12px;">
+            🎉 CLAIM +250 FREE COINS!
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==========================================================
+         MODAL 10: GOOGLE PLAY BILLING CONFIRMATION MODAL
+         ========================================================== -->
+    <div id="billing-modal" class="modal-backdrop">
+      <div class="modal-window" style="max-width: 400px; background: #ffffff; color: #1f2937;">
+        
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; text-align: left;">
+          <div style="width: 36px; height: 36px; background: #01875f; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.3rem;">
+            ▶
+          </div>
+          <div>
+            <div style="font-size: 0.78rem; color: #6b7280; font-weight: bold;">Google Play Billing</div>
+            <div style="font-size: 1.05rem; font-weight: 800; color: #111827;">Slap Chips Tabletop</div>
+          </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 10px 0;">
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin: 14px 0; text-align: left;">
+          <div>
+            <div id="billing-item-name" style="font-weight: 700; font-size: 1rem; color: #111827;">2,500 Coins Pack</div>
+            <div style="font-size: 0.8rem; color: #6b7280;">In-App Purchase</div>
+          </div>
+          <div id="billing-item-price" style="font-size: 1.3rem; font-weight: 800; color: #01875f;">$0.99</div>
+        </div>
+
+        <div style="background: #f3f4f6; border-radius: 8px; padding: 8px 12px; font-size: 0.8rem; color: #4b5563; text-align: left; margin-bottom: 16px;">
+          💳 Visa •••• 4242 &nbsp;|&nbsp; 🔒 1-Tap Buy Verified
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <button id="btn-billing-cancel" class="arcade-btn" style="flex: 1; background: #e5e7eb; color: #374151; padding: 10px;">
+            CANCEL
+          </button>
+          <button id="btn-billing-confirm" class="arcade-btn" style="flex: 1; background: #01875f; color: #ffffff; padding: 10px;">
+            1-TAP BUY
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==========================================================
+         MODAL 11: DAILY LUCKY SPIN WHEEL MODAL
+         ========================================================== -->
+    <div id="spin-modal" class="modal-backdrop">
+      <div class="modal-window modal-spin-window" style="max-width: 480px;">
+        <div class="modal-header-row">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 1.8rem;">🎡</span>
+            <h2 class="modal-title">DAILY LUCKY SPIN</h2>
+          </div>
+          <button id="btn-close-spin" class="modal-close-btn">✕</button>
+        </div>
+
+        <p style="color: #cbd5e1; font-size: 0.88rem; margin: 4px 0 14px;">
+          Spin once every 24 hours to win free Coins, Gems, or the Jackpot!
+        </p>
+
+        <!-- Interactive Spin Wheel Container -->
+        <div class="wheel-stage-container">
+          <!-- Top Arrow Indicator Needle -->
+          <div class="wheel-pointer-needle">▼</div>
+          
+          <!-- Rotating Wheel Disc -->
+          <div id="wheel-disc" class="wheel-disc">
+            <svg viewBox="0 0 300 300" width="280" height="280" class="wheel-svg">
+              <circle cx="150" cy="150" r="148" fill="#1e293b" stroke="#facc15" stroke-width="6" />
+              <!-- Wedge 1: 🪙 100 -->
+              <path d="M150,150 L150,5 A145,145 0 0,1 252.5,47.5 Z" fill="#f59e0b" />
+              <!-- Wedge 2: 💎 10 -->
+              <path d="M150,150 L252.5,47.5 A145,145 0 0,1 295,150 Z" fill="#0284c7" />
+              <!-- Wedge 3: 🪙 250 -->
+              <path d="M150,150 L295,150 A145,145 0 0,1 252.5,252.5 Z" fill="#10b981" />
+              <!-- Wedge 4: 💎 25 -->
+              <path d="M150,150 L252.5,252.5 A145,145 0 0,1 150,295 Z" fill="#6366f1" />
+              <!-- Wedge 5: 🪙 500 -->
+              <path d="M150,150 L150,295 A145,145 0 0,1 47.5,252.5 Z" fill="#ec4899" />
+              <!-- Wedge 6: 💎 50 -->
+              <path d="M150,150 L47.5,252.5 A145,145 0 0,1 5,150 Z" fill="#3b82f6" />
+              <!-- Wedge 7: 🪙 1,000 -->
+              <path d="M150,150 L5,150 A145,145 0 0,1 47.5,47.5 Z" fill="#ea580c" />
+              <!-- Wedge 8: 👑 JACKPOT -->
+              <path d="M150,150 L47.5,47.5 A145,145 0 0,1 150,5 Z" fill="#eab308" />
+              
+              <!-- Wedge Labels -->
+              <text x="175" y="60" fill="#ffffff" font-weight="bold" font-size="12" transform="rotate(22.5 150 150)">🪙 100</text>
+              <text x="175" y="60" fill="#ffffff" font-weight="bold" font-size="12" transform="rotate(67.5 150 150)">💎 10</text>
+              <text x="175" y="60" fill="#ffffff" font-weight="bold" font-size="12" transform="rotate(112.5 150 150)">🪙 250</text>
+              <text x="175" y="60" fill="#ffffff" font-weight="bold" font-size="12" transform="rotate(157.5 150 150)">💎 25</text>
+              <text x="175" y="60" fill="#ffffff" font-weight="bold" font-size="12" transform="rotate(202.5 150 150)">🪙 500</text>
+              <text x="175" y="60" fill="#ffffff" font-weight="bold" font-size="12" transform="rotate(247.5 150 150)">💎 50</text>
+              <text x="175" y="60" fill="#ffffff" font-weight="bold" font-size="12" transform="rotate(292.5 150 150)">🪙 1,000</text>
+              <text x="175" y="60" fill="#111111" font-weight="bold" font-size="12" transform="rotate(337.5 150 150)">👑 JACKPOT</text>
+            </svg>
+          </div>
+
+          <!-- Center Spin Button Hub -->
+          <button id="btn-spin-wheel-center" class="wheel-center-hub">
+            <span class="hub-text">SPIN!</span>
+          </button>
+        </div>
+
+        <!-- Status / Cooldown Timer -->
+        <div id="spin-status-msg" class="spin-cooldown-text">
+          🎁 Free Spin Available Now!
+        </div>
+
+        <!-- Spin Win Celebration Banner -->
+        <div id="spin-win-announcement" class="spin-win-announcement" style="display: none;">
+          <div id="spin-win-text" class="spin-win-title">+250 COINS!</div>
+          <button id="btn-claim-spin-reward" class="arcade-btn btn-golden-3d" style="width: 100%; margin-top: 10px; padding: 12px; font-size: 1.1rem;">
+            🎉 CLAIM REWARD!
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================================
+         SYNCHRONIZED MATCH LAUNCH COUNTDOWN OVERLAY
+         ========================================================== -->
+    <div id="match-countdown-overlay" class="countdown-fullscreen-overlay">
+      <div class="countdown-card">
+        <div class="countdown-title">OPPONENT CONNECTED!</div>
+        <div class="countdown-sub">MATCH STARTING IN</div>
+        <div id="countdown-big-num" class="countdown-number">3</div>
+        <div class="countdown-matchup-row">
+          <span id="countdown-p1-name" style="color: #fde047; font-weight: bold;">Host</span>
+          <span class="countdown-vs">⚔️ VS ⚔️</span>
+          <span id="countdown-p2-name" style="color: #67e8f9; font-weight: bold;">Friend</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Application Logic Scripts -->
+  <script src="js/audio.js"></script>
+  <script src="js/physics.js"></script>
+  <script src="js/characters.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/network.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
