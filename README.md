@@ -115,3 +115,6 @@ To run the game locally:
    ```bash
    git clone https://github.com/MubarakSyed09/Slap-Chips.git
    cd Slap-Chips
+
+
+   ## Will be implemented more 
