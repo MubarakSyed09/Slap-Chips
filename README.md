@@ -65,7 +65,7 @@ Before the crunching begins, each player plants **3 secret slap traps** on their
 | **Aoi** | Cyber Virtual Idol | Laser Pulse Shock | *"Synchronizing table frequencies! Ready, go!"* |
 | **Ren** | Blade Prodigy | Blade Smack Cut | *"The blade of destiny never hesitates."* |
 | **Sakura** | Kawaii Star Student | Star Blossom Burst | *"Snack time is the best part of school!"* |
-
+| **Shinji** | Mecha Vanguard | Plasma Storm Burst | *"I won’t run away from a table showdown!"* |
 | **Robo-Chip 3000** | Chrome Robot AI | Electro-Shock Overload | *"CALCULATING OPTIMAL SLAP TRAJECTORY..."* |
 
 ---
